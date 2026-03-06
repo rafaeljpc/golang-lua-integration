@@ -1,0 +1,57 @@
+# Binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary
+*_test.exe
+*_test.dll
+
+# Output of go test with -c flag (default)
+_test.exe
+_test.dll
+
+# Dependency directories
+vendor/
+
+# Go workspace file
+go.work
+go.work.sum
+
+# IDE and editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.project
+.settings/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Lua cache and temp files
+lua_cache/
+lua_temp/
+*.lcache.*
+
+# Coverage data
+coverage.txt
+profile.out
+profile
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Log files
+*.log
