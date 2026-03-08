@@ -1,0 +1,82 @@
+# golangci-lint configuration file (v2)
+# https://golangci-lint.run/usage/configuration-options/
+
+linters:
+  enable-all: true
+  disable:
+    # Disable overly strict or noisy linters
+    - deadcode
+    - gochecknoinits
+    - golint
+    - interfacer
+    - maligned
+    - varnamelen
+    
+  settings:
+    staticcheck:
+      checks:
+        - all
+        - -ST1003 # disallow unused parameters
+
+run:
+  tests: true
+  timeout: 5m
+  issues-exit-code: 1
+  fast: false
+  
+  go: "2.0"
+  
+  build-tags:
+    - lua
+    
+output:
+  format: colored-line-number
+  print-issued-lines: true
+  print-linter-name: true
+  path-prefix: ""
+
+linters-settings:
+  gofmt:
+    simplify: false
+  
+  goimports:
+    local-prefixes:
+      - golang-lua-integration
+    
+  gocyclo:
+    min-complexity: 10
+    max-complexity: 30
+    
+  golines:
+    minimum-lines: 1
+    maximum-line-length: 120
+  
+  gosec:
+    excludes:
+      - G107 # do not log sensitive data (allow for testing)
+    
+  revive:
+    rules:
+      - disable: true
+      
+  staticcheck:
+    checks:
+      - all
+      - -ST1003
+
+issues:
+  max-soft-limit: 250
+  max-per-linter: 40
+  max-same-issue: 12
+  
+  fix: false
+  exclude-rules:
+    # Exclude certain patterns from linting
+    - path: _test\.go
+      linters:
+        - gosec
+        - staticcheck
+      
+    - text: "unused parameter"
+      linters:
+        - staticcheck
