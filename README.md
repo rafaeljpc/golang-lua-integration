@@ -8,14 +8,14 @@ Essa ferramenta serve para executar scripts lua dentro do Go para realizar taref
 
 ## Casos de uso
 
-### 1 - Listar /tmp e ordenar em ordem alfabética
+### 1 - Listar /tmp e ordenar em ordem alfabética (list-order)
 
 Ao chamar o comando `list-order` o sistema tem que retornar o conteúdo da pasta `/tmp` ordenado alfabéticamente.
 Para isso o script lua `list-order.lua` vai executar os seguintes passos:
 1. Chamar a ferramenta implementada em GO que lê o conteúdo da pasta `/tmp` e retorna a lista de nome de arquivo
 2. Chamar a ferramenta implementada em GO que ordena a lista de nome de arquivo em ordem alfabética
 
-### 2 - Listar /tmp e colocar tudo em maiusculo e salvar resultado no /tmp
+### 2 - Listar /tmp e colocar tudo em maiusculo e salvar resultado no /tmp (list-caps)
 
 Ao chamar o comando `list-caps` o sistema tem que retornar o conteúdo da pasta `/tmp` com tudo em maiusculo.
 Para isso o script lua `list-caps.lua` vai executar os seguintes passos:
