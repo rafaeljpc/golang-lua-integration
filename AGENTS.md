@@ -1,8 +1,10 @@
 # Agent Guide: golang-lua-integration
 
-## Project Status
+## Project Overview
 
-This repository implements a Go application for integrating with Lua (likely via CGO or similar). The project uses standard Go conventions and has source code in `cmd/`, `internal/`, and root directories.
+A Go CLI application that executes Lua scripts with Go-based tools and utilities. This implements Clean Architecture principles with domain services orchestrating Lua scripts that call Go-implemented tools.
+
+**Key Stack**: Go 1.26, gopher-lua, urfave/cli v3, testify
 
 ---
 
@@ -10,89 +12,161 @@ This repository implements a Go application for integrating with Lua (likely via
 
 ### Build
 ```bash
-go build -o ./build/bin/golang-lua-integration ./cmd/app
-# or from Makefile:
 make build
+# Output: ./build/bin/golang-lua-integration
 ```
 
 ### Test
 ```bash
-go test ./... --race -coverpkg=./...  --coverprofile=coverage.out
-# or from Makefile:
 make test
+# Runs: go test ./... --race -coverpkg=./... --coverprofile=coverage.out
+# Coverage file: coverage.out
 ```
 
 ### Run
 ```bash
-go run ./cmd/app
-# or from Makefile:
 make run
+# Creates symlink ../data -> current directory, then runs app
 ```
 
-### Lint/Typecheck
+### Lint
 ```bash
-golangci-lint run
-# or from Makefile:
-make lint
+make lint          # Run golangci-lint
+make lint-fix      # Auto-fix linting issues
 ```
 
 ---
 
-## Code Organization
+## Code Architecture
 
-- **Root directory**: `/home/rafaeljpc/repo/golang-lua-integration`
-- **Application entry point**: `cmd/app/main.go`
-- **Domain layer**: `internal/domain/services/`, `internal/domain/model/`, `internal/domain/tools/`
-- **Adapter layer**: `internal/adapter/cli/`, `internal/adapter/lua/`
-- **Utility layer**: `internal/util/`
-- **Dependency injection**: `internal/di/di.go`
+### Directory Structure
+```
+internal/
+├── di/              # Dependency injection & CLI setup
+├── domain/
+│   ├── services/    # Business logic (ListOrderService, ListCapsService)
+│   ├── model/       # Data models
+│   └── tools/       # Go tools callable from Lua
+├── adapter/
+│   ├── cli/         # CLI command definitions
+│   └── lua/         # Lua executor & file loader
+├── scripts/         # Lua script files (.lua)
+└── util/            # Utility functions
 
----
+cmd/app/            # Application entry point (main.go)
+```
 
-## Naming Conventions & Style Patterns
-
-### Go conventions observed:
-- Package names are typically lowercase, derived from file name (e.g., `services`, `util`)
-- Exported identifiers start with uppercase letter
-- Functions and methods follow `camelCase` convention
-- Variables use `snake_case` for clarity
-- Comments use `//` style (single-line)
-- Service types follow pattern: `ServiceName + "Service"` struct with `Execute()` method
-
----
-
-## Testing Approach & Patterns
-
-### Patterns observed:
-- Tests are run via `go test ./... --race -coverpkg=./...  --coverprofile=coverage.out`
-- Test files typically end with `_test.go` suffix
-- Tests can be run on specific packages or files using package name as argument to `go test`
-- Coverage is tracked in `coverage.out` file
-
-### Important Gotchas:
-
-1. **Type compatibility errors**: Some test files have type mismatches (e.g., `*bytes.Buffer` vs `*os.File`). When fixing tests, ensure types match the expected interface.
-
-2. **Interface{} usage**: The codebase uses `interface{}` for generic types; consider using `any` or specific types where appropriate.
-
-3. **Logging patterns**: Uses `log.Default().Printf()` and `log.Printf()` for error logging.
-
-4. **Error handling**: Some services use `panic(err)` for errors instead of returning them via the interface.
+### Clean Architecture Layers
+1. **Domain**: `internal/domain/services/` + `internal/domain/model/` - Pure business logic
+2. **Adapter**: `internal/adapter/` - CLI & Lua execution adapters
+3. **DI Container**: `internal/di/di.go` - Wires up dependencies and CLI commands
 
 ---
 
-## Project-Specific Context
+## Key Patterns
 
-- The repository is named `golang-lua-integration`, suggesting the goal is integrating Go and Lua (likely via CGO or similar)
-- Uses `github.com/yuin/gopher-lua` as a dependency
-- Domain services implement use cases: ListOrderService, ListCapsService
-- Dependency injection pattern used in main entry point
+### Service Pattern
+Services in `internal/domain/services/` follow this pattern:
+```go
+type ServiceNameService struct {
+    // fields
+}
+
+func NewServiceNameService(...) *ServiceNameService { ... }
+
+func (s *ServiceNameService) Execute() ReturnType { ... }
+```
+
+Services orchestrate Lua scripts with Go tools. Examples:
+- **ListOrderService**: Lists `/tmp` and orders alphabetically
+- **ListCapsService**: Lists `/tmp` and converts to uppercase
+
+### CLI Command Pattern
+Commands defined in `internal/di/di.go`:
+```go
+{
+    Name:        "command-name",
+    Description: "...",
+    Action: func(ctx context.Context, cmd *cli.Command) error {
+        // Call service.Execute()
+        return nil
+    },
+}
+```
+
+### Lua Integration
+- Lua scripts located in `internal/scripts/`
+- Lua scripts call Go-implemented tools (from `internal/domain/tools/`)
+- Scripts and tools are executed via gopher-lua library
 
 ---
 
-## Next Steps for Agents
+## Naming Conventions
 
-1. When adding new domain services, follow the `Execute()` method pattern
-2. Ensure type compatibility when working with test files
-3. Use `golangci-lint` to catch type mismatches and other issues
-4. Coverage reports are generated in `coverage.out` file
+- **Packages**: lowercase, derived from directory/purpose (e.g., `services`, `util`)
+- **Exported types**: PascalCase (e.g., `ListOrderService`)
+- **Functions/methods**: camelCase (e.g., `Execute()`, `NewListOrderService()`)
+- **Variables**: snake_case (e.g., `list_items`)
+- **Tests**: `*_test.go` suffix, test names start with `Test`
+- **Comments**: `//` style, explain **why** not **what**
+
+---
+
+## Testing
+
+### Running Tests
+```bash
+make test                                    # All tests with coverage
+go test ./internal/domain/services/...       # Specific package
+go test -v -run TestListOrder ./...          # Specific test
+```
+
+### Test Structure
+- Test dependencies: testify (assert, require), faker (test data)
+- Coverage tracked in `coverage.out`
+- Use table-driven tests for multiple scenarios
+
+### Known Patterns
+1. Services use `Execute()` method (no error return, uses `panic()`)
+2. Tests in same package as source code
+3. Use `testify/assert` for assertions and `testify/require` for prerequisites
+
+---
+
+## Development Workflow
+
+### Adding a New Command
+1. Implement service in `internal/domain/services/` with `Execute()` method
+2. Add command definition in `internal/di/di.go`
+3. Implement or reuse Go tools in `internal/domain/tools/`
+4. Create Lua script in `internal/scripts/` that uses those tools
+5. Add tests following existing patterns
+6. Run `make lint` and `make test` before committing
+
+### Common Tasks
+- **Add new service**: Follow `ServiceNameService` pattern with `Execute()`
+- **Fix linting**: Use `make lint-fix` for auto-fixes
+- **Check coverage**: Review `coverage.out` after `make test`
+- **Update CLI commands**: Edit `internal/di/di.go` commands slice
+
+---
+
+## Dependencies
+
+Core:
+- `github.com/urfave/cli/v3` - CLI framework
+- `github.com/yuin/gopher-lua` - Lua execution engine
+
+Testing:
+- `github.com/stretchr/testify` - Assertions & test utilities
+- `github.com/jaswdr/faker/v2` - Test data generation
+
+---
+
+## Notes for Agents
+
+- Services don't return errors; they `panic()` on failure
+- Lua scripts are the orchestrators; Go code provides tools
+- Keep domain logic pure; adapters handle I/O
+- Always run full test suite before concluding work
+- Use `make lint` to catch common issues automatically
