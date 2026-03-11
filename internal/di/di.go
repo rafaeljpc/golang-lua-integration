@@ -22,6 +22,7 @@ func Init(ctx context.Context) *DependencyInjector {
 				Description: "List /tmp and order alphabetically",
 				Action: func(ctx context.Context, command *cli.Command) error {
 					fmt.Printf("list-order called\n")
+
 					return nil
 				},
 			},
@@ -30,6 +31,7 @@ func Init(ctx context.Context) *DependencyInjector {
 				Description: "List /tmp and convert to uppercase",
 				Action: func(ctx context.Context, command *cli.Command) error {
 					fmt.Printf("list-caps called\n")
+
 					return nil
 				},
 			},

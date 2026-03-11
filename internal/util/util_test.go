@@ -54,5 +54,5 @@ func Test_ToJSON_InvalidJSONString(t *testing.T) {
 	result := ToJSON(src)
 
 	// Then
-	assert.Equal(t, "", result)
+	assert.Empty(t, result)
 }

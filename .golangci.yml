@@ -1,82 +1,270 @@
-# golangci-lint configuration file (v2)
-# https://golangci-lint.run/usage/configuration-options/
-
-linters:
-  enable-all: true
-  disable:
-    # Disable overly strict or noisy linters
-    - deadcode
-    - gochecknoinits
-    - golint
-    - interfacer
-    - maligned
-    - varnamelen
-    
-  settings:
-    staticcheck:
-      checks:
-        - all
-        - -ST1003 # disallow unused parameters
+version: 2
 
 run:
-  tests: true
   timeout: 5m
+  go: "1.26"
+  tests: true
   issues-exit-code: 1
   fast: false
-  
-  go: "2.0"
-  
-  build-tags:
-    - lua
-    
+
+linters:
+  disable-all: true
+  enable:
+    - asasalint
+    - asciicheck
+    - bidichk
+    - bodyclose
+    - contextcheck
+    - copyloopvar
+    - cyclop
+    - decorder
+    - dogsled
+    - dupl
+    - dupword
+    - durationcheck
+    - errcheck
+    - errname
+    - errorlint
+    - err113
+    - exhaustive
+    - forbidigo
+    - forcetypeassert
+    - funlen
+    - gocheckcompilerdirectives
+    - gochecknoglobals
+    - gochecknoinits
+    - gocognit
+    - goconst
+    - gocritic
+    - gocyclo
+    - godot
+    - godox
+    - goheader
+    - gomoddirectives
+    - gomodguard
+    - goprintffuncname
+    - gosec
+    - gosmopolitan
+    - govet
+    - grouper
+    - iface
+    - importas
+    - inamedparam
+    - ineffassign
+    - interfacebloat
+    - intrange
+    - iotamixing
+    - ireturn
+    - lll
+    - loggercheck
+    - maintidx
+    - makezero
+    - mirror
+    - misspell
+    - mnd
+    - musttag
+    - nakedret
+    - nestif
+    - nilerr
+    - nilnesserr
+    - nilnil
+    - nlreturn
+    - noctx
+    - noinlineerr
+    - nolintlint
+    - nonamedreturns
+    - nosprintfhostport
+    - paralleltest
+    - perfsprint
+    - prealloc
+    - predeclared
+    - promlinter
+    - protogetter
+    - revive
+    - rowserrcheck
+    - sloglint
+    - spancheck
+    - sqlclosecheck
+    - staticcheck
+    - tagalign
+    - tagliatelle
+    - testableexamples
+    - testifylint
+    - testpackage
+    - thelper
+    - tparallel
+    - unconvert
+    - unparam
+    - unused
+    - usestdlibvars
+    - varnamelen
+    - wastedassign
+    - whitespace
+    - wrapcheck
+    - wsl_v5
+    - zerologlint
+
+linters-settings:
+  cyclop:
+    max-complexity: 10
+    package-average: 0
+    skip-tests: false
+
+  errcheck:
+    check-type-assertions: false
+    check-blank: false
+
+  forbidigo:
+    forbid:
+      - p: ^fmt\.(Print(|f|ln)|Scan(|f|ln))$
+        msg: "use structured logging instead"
+
+  funlen:
+    lines: 60
+    statements: 40
+
+  gocognit:
+    min-complexity: 15
+
+  gocritic:
+    enabled-tags:
+      - diagnostic
+      - style
+      - performance
+      - opinionated
+
+  gocyclo:
+    min-complexity: 10
+
+  godox:
+    keywords:
+      - BUG
+      - FIXME
+      - HACK
+      - NOTE
+      - OPTIMIZE
+      - TODO
+      - XXX
+
+  loggercheck:
+    kitlog: false
+    klog: false
+    logr: false
+    slog: false
+    zap: false
+
+  maintidx:
+    under: 20
+
+  misspell:
+    locale: US
+
+  nolintlint:
+    allow-unused: false
+    allow-no-explanation: []
+    require-explanation: false
+    require-specific: false
+
+  revive:
+    rules:
+      - name: blank-imports
+        disabled: false
+      - name: context-as-argument
+        disabled: false
+      - name: context-keys-type
+        disabled: false
+      - name: error-naming
+        disabled: false
+      - name: error-strings
+        disabled: false
+      - name: error-return
+        disabled: false
+      - name: exported
+        disabled: false
+      - name: if-return
+        disabled: false
+      - name: increment-decrement
+        disabled: false
+      - name: indent-error-flow
+        disabled: false
+      - name: interface-naming
+        disabled: false
+      - name: range
+        disabled: false
+      - name: receiver-naming
+        disabled: false
+      - name: time-naming
+        disabled: false
+      - name: unexported-naming
+        disabled: false
+      - name: var-naming
+        disabled: false
+
+  staticcheck:
+    go: "1.26"
+    checks:
+      - all
+
+  tagliatelle:
+    case:
+      rules:
+        json: snake
+        yaml: snake
+        xml: snake
+        bson: snake
+        mapstructure: snake
+
+  varnamelen:
+    max-distance: 5
+    min-name-length: 1
+
+  wsl_v5:
+    strict-append: true
+    allow-assign-and-anything: false
+    allow-multiline-assign: false
+    allow-case-trailing-whitespace: false
+    allow-cuddle-declarations: false
+    allow-separated-leading-comment: false
+    force-case-trailing-whitespace: false
+    allow-first-in-block: true
+    allow-whole-block: false
+    branch-max-lines: 2
+
+issues:
+  exclude-rules:
+    - path: _test\.go
+      linters:
+        - cyclop
+        - dupl
+        - forcetypeassert
+        - funlen
+        - gocognit
+        - gocritic
+        - gosec
+        - gosmopolitan
+        - lll
+        - maintidx
+        - musttag
+        - nonamedreturns
+        - testableexamples
+        - varnamelen
+        - wrapcheck
+        - wsl_v5
+
+    - path: cmd/
+      linters:
+        - wrapcheck
+
+    - linters:
+        - godot
+      source: "^//"
+
+  exclude-dirs-use-default: true
+  max-issues-per-linter: 0
+  max-same-issues: 0
+
 output:
   format: colored-line-number
   print-issued-lines: true
   print-linter-name: true
-  path-prefix: ""
-
-linters-settings:
-  gofmt:
-    simplify: false
-  
-  goimports:
-    local-prefixes:
-      - golang-lua-integration
-    
-  gocyclo:
-    min-complexity: 10
-    max-complexity: 30
-    
-  golines:
-    minimum-lines: 1
-    maximum-line-length: 120
-  
-  gosec:
-    excludes:
-      - G107 # do not log sensitive data (allow for testing)
-    
-  revive:
-    rules:
-      - disable: true
-      
-  staticcheck:
-    checks:
-      - all
-      - -ST1003
-
-issues:
-  max-soft-limit: 250
-  max-per-linter: 40
-  max-same-issue: 12
-  
-  fix: false
-  exclude-rules:
-    # Exclude certain patterns from linting
-    - path: _test\.go
-      linters:
-        - gosec
-        - staticcheck
-      
-    - text: "unused parameter"
-      linters:
-        - staticcheck
+  uniq-by-line: true

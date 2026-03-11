@@ -12,6 +12,7 @@
 # Output of go test with -c flag (default)
 _test.exe
 _test.dll
+coverage.out
 
 # Dependency directories
 vendor/
