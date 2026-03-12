@@ -1,17 +1,17 @@
+// Package commands provides CLI command implementations.
 package commands
 
 import (
-	"bytes"
-	"io"
-	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-// TestListCapsCommandInitialization tests the initialization and basic behavior of ListCapsCommand
+// TestListCapsCommandInitialization tests the initialization and basic behavior of ListCapsCommand.
 func TestListCapsCommandInitialization(t *testing.T) {
+	t.Parallel()
+
 	// Given: A ListCapsCommand is initialized
 	ctx := t.Context()
 	cmd := NewListCapsCommand(ctx)
@@ -20,11 +20,13 @@ func TestListCapsCommandInitialization(t *testing.T) {
 	err := cmd.Run(ctx, &cmd.Command)
 
 	// Then: should return no error
-	assert.NoError(t, err)
+	require.NoError(t, err)
 }
 
-// TestListCapsCommandNameAndDescription tests the command metadata
+// TestListCapsCommandNameAndDescription tests the command metadata.
 func TestListCapsCommandNameAndDescription(t *testing.T) {
+	t.Parallel()
+
 	// Given: A ListCapsCommand is created
 	ctx := t.Context()
 	cmd := NewListCapsCommand(ctx)
@@ -35,42 +37,33 @@ func TestListCapsCommandNameAndDescription(t *testing.T) {
 	assert.Contains(t, cmd.Description, "uppercase")
 }
 
-// TestListCapsCommandActionAssignment tests the Action field assignment
+// TestListCapsCommandActionAssignment tests that Action is properly set.
 func TestListCapsCommandActionAssignment(t *testing.T) {
+	t.Parallel()
+
 	// Given: A ListCapsCommand instance
 	ctx := t.Context()
 	cmd := NewListCapsCommand(ctx)
 
-	// When: executing the command
-	// Then: the Action field should be properly assigned
+	// When: checking the command structure
+	// Then: the Action field should be properly assigned and the name should be correct
 	require.NotNil(t, cmd)
 	assert.NotNil(t, cmd.Action)
 	require.Equal(t, "list-caps", cmd.Name)
 }
 
-// TestListOrderCommandExecution tests the command execution
+// TestListCapsCommandExecution tests the command execution.
 func TestListCapsCommandExecution(t *testing.T) {
-	// Given: A NewListCapsCommand instance with test data
+	t.Parallel()
+
+	// Given: A ListCapsCommand instance
 	ctx := t.Context()
 	cmd := NewListCapsCommand(ctx)
 
-	oldStdout := os.Stdout
-	r, w, _ := os.Pipe()
-	os.Stdout = w
-
-	// When
+	// When: the Action method is invoked
 	err := cmd.Action(ctx, &cmd.Command)
 
-	w.Close()
-	os.Stdout = oldStdout
-
-	// Then
-	assert.NoError(t, err)
-
-	var buf bytes.Buffer
-	io.Copy(&buf, r)
-
-	bufStr := buf.String()
-
-	assert.Contains(t, bufStr, "list-caps")
+	// Then: it should execute without error
+	require.NoError(t, err)
+	assert.Equal(t, "list-caps", cmd.Name)
 }

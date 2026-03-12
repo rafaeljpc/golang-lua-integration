@@ -1,16 +1,18 @@
+// Package commands provides CLI command implementations.
 package commands
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/urfave/cli/v3"
 )
 
+// ListOrderCommand is a CLI command that lists and orders files.
 type ListOrderCommand struct {
 	cli.Command
 }
 
+// NewListOrderCommand creates a new ListOrderCommand instance.
 func NewListOrderCommand(ctx context.Context) *ListOrderCommand {
 	cmd := &ListOrderCommand{
 		cli.Command{
@@ -24,8 +26,7 @@ func NewListOrderCommand(ctx context.Context) *ListOrderCommand {
 	return cmd
 }
 
-func (cmd *ListOrderCommand) Run(ctx context.Context, command *cli.Command) error {
-	fmt.Printf("list-order called\n")
-	
+// Run executes the list-order command.
+func (cmd *ListOrderCommand) Run(_ context.Context, _ *cli.Command) error {
 	return nil
 }
