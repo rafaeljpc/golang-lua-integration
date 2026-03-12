@@ -13,7 +13,7 @@ type ListOrderCommand struct {
 }
 
 // NewListOrderCommand creates a new ListOrderCommand instance.
-func NewListOrderCommand(ctx context.Context) *ListOrderCommand {
+func NewListOrderCommand(_ context.Context) *ListOrderCommand {
 	cmd := &ListOrderCommand{
 		cli.Command{
 			Name:        "list-order",

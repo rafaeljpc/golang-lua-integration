@@ -8,6 +8,7 @@ import (
 )
 
 func Test_ToJSON_SimpleObject(t *testing.T) {
+	t.Parallel()
 	// Given
 	src := map[string]string{"key": "value"}
 
@@ -21,6 +22,7 @@ func Test_ToJSON_SimpleObject(t *testing.T) {
 }
 
 func Test_ToJSON_NestedObject(t *testing.T) {
+	t.Parallel()
 	// Given
 	src := map[string]interface{}{"outer": map[string]string{"inner": "data"}}
 
@@ -34,6 +36,7 @@ func Test_ToJSON_NestedObject(t *testing.T) {
 }
 
 func Test_ToJSON_EmptyObject(t *testing.T) {
+	t.Parallel()
 	// Given
 	src := map[string]string{}
 
@@ -47,6 +50,7 @@ func Test_ToJSON_EmptyObject(t *testing.T) {
 }
 
 func Test_ToJSON_InvalidJSONString(t *testing.T) {
+	t.Parallel()
 	// Given
 	src := math.Inf(1)
 

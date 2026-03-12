@@ -5,17 +5,19 @@ import (
 	"strings"
 )
 
-// ListCapsService - Caso de uso 2: Listar /tmp e colocar tudo em maiusculo e salvar resultado no /tmp.
+// ListCapsService implements the use case to list files and convert names to uppercase.
 type ListCapsService struct {
 	path string
 }
 
+// NewListCapsService creates a new ListCapsService instance.
 func NewListCapsService(path string) *ListCapsService {
 	return &ListCapsService{
 		path: path,
 	}
 }
 
+// Execute lists files in the specified directory and returns them in uppercase.
 func (s *ListCapsService) Execute() []string {
 	files, err := os.ReadDir(s.path)
 	if err != nil {

@@ -1,18 +1,21 @@
+// Package di provides dependency injection and CLI setup.
 package di
 
 import (
 	"context"
-	"fmt"
+	"log"
 	"os"
 
 	"github.com/urfave/cli/v3"
 )
 
+// DependencyInjector manages application dependencies and CLI setup.
 type DependencyInjector struct {
 	cmd *cli.Command
 }
 
-func Init(ctx context.Context) *DependencyInjector {
+// Init initializes the DependencyInjector with CLI commands.
+func Init(_ context.Context) *DependencyInjector {
 	cmd := &cli.Command{
 		Name:    "golang-lua-integration",
 		Version: "0.0.1",
@@ -20,18 +23,14 @@ func Init(ctx context.Context) *DependencyInjector {
 			{
 				Name:        "list-order",
 				Description: "List /tmp and order alphabetically",
-				Action: func(ctx context.Context, command *cli.Command) error {
-					fmt.Printf("list-order called\n")
-
+				Action: func(_ context.Context, _ *cli.Command) error {
 					return nil
 				},
 			},
 			{
 				Name:        "list-caps",
 				Description: "List /tmp and convert to uppercase",
-				Action: func(ctx context.Context, command *cli.Command) error {
-					fmt.Printf("list-caps called\n")
-
+				Action: func(_ context.Context, _ *cli.Command) error {
 					return nil
 				},
 			},
@@ -43,6 +42,10 @@ func Init(ctx context.Context) *DependencyInjector {
 	}
 }
 
-func (di *DependencyInjector) Run(ctx context.Context, args []string) {
-	di.cmd.Run(context.Background(), os.Args)
+// Run executes the CLI application.
+func (di *DependencyInjector) Run(ctx context.Context, _ []string) {
+	err := di.cmd.Run(ctx, os.Args)
+	if err != nil {
+		log.Fatalf("Error: %v", err)
+	}
 }

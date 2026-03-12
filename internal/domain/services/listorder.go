@@ -1,3 +1,4 @@
+// Package services provides domain business logic for use cases.
 package services
 
 import (
@@ -5,17 +6,19 @@ import (
 	"sort"
 )
 
-// ListOrderService - Caso de uso 1: Listar /tmp e ordenar em ordem alfabética.
+// ListOrderService implements the use case to list and order files alphabetically.
 type ListOrderService struct {
 	path string
 }
 
+// NewListOrderService creates a new ListOrderService instance.
 func NewListOrderService(path string) *ListOrderService {
 	return &ListOrderService{
 		path: path,
 	}
 }
 
+// Execute lists files in the specified directory and returns them in alphabetical order.
 func (s *ListOrderService) Execute() []string {
 	files, err := os.ReadDir(s.path)
 	if err != nil {

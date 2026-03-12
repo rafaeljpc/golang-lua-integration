@@ -13,7 +13,7 @@ type ListCapsCommand struct {
 }
 
 // NewListCapsCommand creates a new ListCapsCommand instance.
-func NewListCapsCommand(ctx context.Context) *ListCapsCommand {
+func NewListCapsCommand(_ context.Context) *ListCapsCommand {
 	cmd := &ListCapsCommand{
 		cli.Command{
 			Name:        "list-caps",
