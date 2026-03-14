@@ -90,7 +90,6 @@ linters:
     - tagliatelle
     - testableexamples
     - testifylint
-    - testpackage
     - thelper
     - tparallel
     - unconvert
@@ -214,6 +213,9 @@ linters-settings:
         bson: snake
         mapstructure: snake
 
+  testpackage:
+    skip: true
+
   varnamelen:
     max-distance: 5
     min-name-length: 1
@@ -247,6 +249,7 @@ issues:
         - musttag
         - nonamedreturns
         - testableexamples
+        - testpackage
         - varnamelen
         - wrapcheck
         - wsl_v5

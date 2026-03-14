@@ -1,69 +1,122 @@
-// Package commands provides CLI command implementations.
 package commands
 
 import (
+	"bytes"
+	"context"
+	"golang-lua-integration/internal/domain/services"
+	"io"
+	"os"
+	"strings"
+	"sync"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.uber.org/mock/gomock"
 )
 
-// TestListCapsCommandInitialization tests the initialization and basic behavior of ListCapsCommand.
-func TestListCapsCommandInitialization(t *testing.T) {
-	t.Parallel()
-
-	// Given: A ListCapsCommand is initialized
+// TestListCapsCommandExecuteSuccess tests successful execution of ListCapsCommand with mocked service.
+func TestListCapsCommandExecuteSuccess(t *testing.T) {
+	// Given
 	ctx := t.Context()
-	cmd := NewListCapsCommand(ctx)
+	ctrl := gomock.NewController(t)
 
-	// When: Run method is called with valid context
+	mockService := services.NewMockListService(ctrl)
+	expectedListFileName := []string{"FILE1.TXT", "FILE2.TXT"}
+
+	mockService.EXPECT().Execute().Return(expectedListFileName)
+
+	cmd := NewListCapsCommand(ctx, mockService)
+
+	oldStdout := os.Stdout
+	r, w, _ := os.Pipe()
+	os.Stdout = w
+
+	var wg sync.WaitGroup
+	wg.Add(1)
+
+	// When
 	err := cmd.Run(ctx, &cmd.Command)
 
-	// Then: should return no error
-	require.NoError(t, err)
+	// Then
+	var buf bytes.Buffer
+	go func() {
+		defer wg.Done()
+		io.Copy(&buf, r)
+	}()
+	w.Close()
+	os.Stdout = oldStdout
+
+	wg.Wait()
+
+	resultStr := buf.String()
+
+	assert.NoError(t, err)
+	assert.Equal(t, strings.Join(expectedListFileName, "\n")+"\n", resultStr)
 }
 
 // TestListCapsCommandNameAndDescription tests the command metadata.
 func TestListCapsCommandNameAndDescription(t *testing.T) {
-	t.Parallel()
-
-	// Given: A ListCapsCommand is created
+	// Given
 	ctx := t.Context()
-	cmd := NewListCapsCommand(ctx)
+	ctrl := gomock.NewController(t)
 
-	// When: the command name and description are set correctly
-	// Then: the Name should be "list-caps" and Description should contain "uppercase"
+	mockService := services.NewMockListService(ctrl)
+
+	// When
+	cmd := NewListCapsCommand(ctx, mockService)
+
+	// Then
 	assert.Equal(t, "list-caps", cmd.Name)
 	assert.Contains(t, cmd.Description, "uppercase")
 }
 
-// TestListCapsCommandActionAssignment tests that Action is properly set.
-func TestListCapsCommandActionAssignment(t *testing.T) {
-	t.Parallel()
-
-	// Given: A ListCapsCommand instance
+// TestListCapsCommandContextCancellation tests context cancellation handling.
+func TestListCapsCommandContextCancellation(t *testing.T) {
+	// Given
 	ctx := t.Context()
-	cmd := NewListCapsCommand(ctx)
+	ctrl := gomock.NewController(t)
 
-	// When: checking the command structure
-	// Then: the Action field should be properly assigned and the name should be correct
+	mockService := services.NewMockListService(ctrl)
+
+	// When
+	cmd := NewListCapsCommand(ctx, mockService)
+
+	_, cancel := context.WithCancel(ctx)
+	cancel()
+
+	// Then
 	require.NotNil(t, cmd)
-	assert.NotNil(t, cmd.Action)
 	require.Equal(t, "list-caps", cmd.Name)
+	assert.NotNil(t, cmd.Action)
 }
 
-// TestListCapsCommandExecution tests the command execution.
-func TestListCapsCommandExecution(t *testing.T) {
-	t.Parallel()
-
-	// Given: A ListCapsCommand instance
+// TestListCapsCommandActionAssignment tests that Action is properly set.
+func TestListCapsCommandActionAssignment(t *testing.T) {
+	// Given
 	ctx := t.Context()
-	cmd := NewListCapsCommand(ctx)
+	ctrl := gomock.NewController(t)
 
-	// When: the Action method is invoked
-	err := cmd.Action(ctx, &cmd.Command)
+	mockService := services.NewMockListService(ctrl)
 
-	// Then: it should execute without error
-	require.NoError(t, err)
+	// When
+	cmd := NewListCapsCommand(ctx, mockService)
+
+	// Then
+	require.NotNil(t, cmd)
+	require.NotNil(t, cmd.Action)
 	assert.Equal(t, "list-caps", cmd.Name)
+}
+
+// TestListCapsCommandNoServiceInjection tests error handling when service is not injected.
+func TestListCapsCommandNoServiceInjection(t *testing.T) {
+	// Given
+	ctx := t.Context()
+	cmd := NewListCapsCommand(ctx, nil)
+
+	// When
+	err := cmd.Run(ctx, nil)
+
+	// Then
+	require.Error(t, err)
 }

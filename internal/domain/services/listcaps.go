@@ -10,6 +10,8 @@ type ListCapsService struct {
 	path string
 }
 
+var _ ListService = (*ListCapsService)(nil)
+
 // NewListCapsService creates a new ListCapsService instance.
 func NewListCapsService(path string) *ListCapsService {
 	return &ListCapsService{

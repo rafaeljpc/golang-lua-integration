@@ -29,4 +29,4 @@ lint-fix:
 	golangci-lint run --fix
 
 generate-mocks:
-	
+	mockgen -source=internal/domain/services/listservice.go -destination=internal/domain/services/listservice_mock.go -package=services

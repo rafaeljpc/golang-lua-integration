@@ -7,6 +7,8 @@ import (
 	"os"
 
 	"github.com/urfave/cli/v3"
+	"golang-lua-integration/internal/adapter/cli/commands"
+	"golang-lua-integration/internal/domain/services"
 )
 
 // DependencyInjector manages application dependencies and CLI setup.
@@ -15,25 +17,19 @@ type DependencyInjector struct {
 }
 
 // Init initializes the DependencyInjector with CLI commands.
-func Init(_ context.Context) *DependencyInjector {
+func Init(ctx context.Context) *DependencyInjector {
+	listOrderService := services.NewListOrderService("/tmp")
+	listCapsService := services.NewListCapsService("/tmp")
+
+	listOrderCmd := commands.NewListOrderCommand(ctx, listOrderService)
+	listCapsCmd := commands.NewListCapsCommand(ctx, listCapsService)
+
 	cmd := &cli.Command{
 		Name:    "golang-lua-integration",
 		Version: "0.0.1",
 		Commands: []*cli.Command{
-			{
-				Name:        "list-order",
-				Description: "List /tmp and order alphabetically",
-				Action: func(_ context.Context, _ *cli.Command) error {
-					return nil
-				},
-			},
-			{
-				Name:        "list-caps",
-				Description: "List /tmp and convert to uppercase",
-				Action: func(_ context.Context, _ *cli.Command) error {
-					return nil
-				},
-			},
+			&listOrderCmd.Command,
+			&listCapsCmd.Command,
 		},
 	}
 

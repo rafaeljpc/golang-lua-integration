@@ -9,8 +9,6 @@ import (
 )
 
 func TestListOrderService_Execute(t *testing.T) {
-	t.Parallel()
-
 	// Given
 	tmpDir := t.TempDir()
 
@@ -21,10 +19,10 @@ func TestListOrderService_Execute(t *testing.T) {
 
 	service := NewListOrderService(tmpDir)
 
-	// When - Execute service and capture stdout
+	// When
 	result := service.Execute()
 
-	// Then - Verify files are returned in alphabetical order
+	// Then
 	expectedOrder := []string{"apple.txt", "mango.txt", "zebra.txt"}
 	assert.Len(t, result, len(expectedOrder))
 

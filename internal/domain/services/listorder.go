@@ -11,6 +11,8 @@ type ListOrderService struct {
 	path string
 }
 
+var _ ListService = (*ListOrderService)(nil)
+
 // NewListOrderService creates a new ListOrderService instance.
 func NewListOrderService(path string) *ListOrderService {
 	return &ListOrderService{

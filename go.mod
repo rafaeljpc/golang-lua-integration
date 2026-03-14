@@ -3,10 +3,9 @@ module golang-lua-integration
 go 1.26
 
 require (
-	github.com/jaswdr/faker/v2 v2.9.1
 	github.com/stretchr/testify v1.11.1
 	github.com/urfave/cli/v3 v3.7.0
-	github.com/yuin/gopher-lua v1.1.1
+	go.uber.org/mock v0.6.0
 )
 
 require (
